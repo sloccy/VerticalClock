@@ -17,10 +17,19 @@ bash scripts/setup.sh        # adds plasma-workspace as sparse submodule
 bash scripts/build.sh        # assembles build/package/
 ```
 
-## Deploy to your Fedora KDE machine
+## Install / update on your Fedora KDE machine
+
+Every push to `main` builds a release zip automatically. On your Fedora box:
 
 ```bash
-VCLOCK_HOST=user@fedora-box bash scripts/deploy.sh
+bash <(curl -fsSL https://github.com/sloccy/VerticalClock/raw/main/scripts/install-or-update.sh)
+```
+
+Or download and run the script manually:
+
+```bash
+curl -fL https://github.com/sloccy/VerticalClock/releases/latest/download/verticalclock.zip -o /tmp/verticalclock.zip
+kpackagetool6 -t Plasma/Applet -u /tmp/verticalclock.zip || kpackagetool6 -t Plasma/Applet -i /tmp/verticalclock.zip
 ```
 
 Then right-click your vertical panel → Add Widgets → search "Vertical Clock".

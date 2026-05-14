@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Check overlay anchors
+        run: bash scripts/check-anchors.sh
+
+      - name: Build package
+        run: bash scripts/build.sh
+
+      - name: Zip package
+        run: |
+          cd build
+          zip -r verticalclock.zip package/
+          echo "SHA256: $(sha256sum verticalclock.zip)"
+
+      - name: Update rolling release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest build
+          body: |
+            Auto-built from `main` at ${{ github.sha }}.
+
+            **Install / update on Fedora:**
+            ```bash
+            curl -L https://github.com/${{ github.repository }}/releases/latest/download/verticalclock.zip -o /tmp/verticalclock.zip \
+              && kpackagetool6 -t Plasma/Applet -u /tmp/verticalclock.zip \
+              || kpackagetool6 -t Plasma/Applet -i /tmp/verticalclock.zip
+            ```
+          files: build/verticalclock.zip
+          prerelease: false
+          make_latest: true
