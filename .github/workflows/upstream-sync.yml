@@ -1,0 +1,81 @@
+name: Upstream sync
+
+on:
+  schedule:
+    - cron: '0 7 * * 1'   # Mondays 07:00 UTC
+  workflow_dispatch:        # "Run workflow" button on Actions tab
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+
+      - name: Bump upstream submodule
+        id: bump
+        run: |
+          cd upstream
+          OLD=$(git rev-parse HEAD)
+          git fetch --depth=1 origin master
+          git checkout origin/master
+          NEW=$(git rev-parse HEAD)
+          echo "old=$OLD" >> "$GITHUB_OUTPUT"
+          echo "new=$NEW" >> "$GITHUB_OUTPUT"
+          if [ "$OLD" = "$NEW" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Stop if no change
+        if: steps.bump.outputs.changed == 'false'
+        run: |
+          echo "Upstream unchanged at ${{ steps.bump.outputs.old }}. Nothing to do."
+          exit 0
+
+      - name: Verify overlay anchors still present
+        id: anchors
+        continue-on-error: true
+        run: bash scripts/check-anchors.sh
+
+      - name: Build package
+        run: bash scripts/build.sh
+
+      - name: Optional QML lint
+        continue-on-error: true
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y qt6-declarative-dev-tools 2>/dev/null || true
+          if command -v qmllint6 &>/dev/null; then
+            qmllint6 build/package/*.qml || true
+          else
+            echo "qmllint6 not available, skipping."
+          fi
+
+      - name: Open PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: upstream-sync/${{ steps.bump.outputs.new }}
+          title: "chore: upstream sync ${{ steps.bump.outputs.new && steps.bump.outputs.new[:12] || steps.bump.outputs.new }}"
+          commit-message: "chore: bump upstream plasma-workspace to ${{ steps.bump.outputs.new }}"
+          body: |
+            Automated bump of `upstream/` submodule.
+
+            | | SHA |
+            |---|---|
+            | **Old** | `${{ steps.bump.outputs.old }}` |
+            | **New** | `${{ steps.bump.outputs.new }}` |
+
+            **Overlay anchor check:** `${{ steps.anchors.outcome }}`
+            - `success` = overlay still references valid upstream symbols, safe to merge
+            - `failure` = upstream refactored something our overlay patches; review `overlay/DigitalClock.qml` and `overlay/configAppearance.qml` before merging
+
+            [View diff on KDE Invent](https://invent.kde.org/plasma/plasma-workspace/-/compare/${{ steps.bump.outputs.old }}...${{ steps.bump.outputs.new }})
+          labels: upstream-sync

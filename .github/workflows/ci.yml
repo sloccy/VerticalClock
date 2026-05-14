@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Check overlay anchors
+        run: bash scripts/check-anchors.sh
+
+      - name: Build package
+        run: bash scripts/build.sh
+
+      - name: Verify required files exist
+        run: |
+          test -f build/package/metadata.json
+          test -f build/package/DigitalClock.qml
+          test -f build/package/main.xml
+          test -f build/package/main.qml
+          test -f build/package/CalendarView.qml
+          echo "All required files present."

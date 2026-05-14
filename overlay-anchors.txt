@@ -1,0 +1,20 @@
+# Strings that must exist in upstream for our overlay to apply cleanly.
+# Format: file<TAB>literal-string
+# Script: scripts/check-anchors.sh
+# Add a line here for every upstream symbol our overlay patches.
+
+DigitalClock.qml	id: labelsGrid
+DigitalClock.qml	id: contentItem
+DigitalClock.qml	id: timeLabel
+DigitalClock.qml	id: fontHelper
+DigitalClock.qml	id: dateLabel
+DigitalClock.qml	id: sizehelper
+DigitalClock.qml	name: "verticalPanel"
+DigitalClock.qml	anchors.top: labelsGrid.bottom
+DigitalClock.qml	anchors.horizontalCenter: labelsGrid.horizontalCenter
+DigitalClock.qml	contentItem.height: contentItem.Plasmoid.configuration.showDate ? labelsGrid.height + dateLabel.contentHeight : labelsGrid.height
+DigitalClock.qml	labelsGrid.rows: 2
+main.xml	<entry name="use24hFormat" type="UInt">
+configAppearance.qml	id: use24hFormat
+configAppearance.qml	cfg_use24hFormat
+configAppearance.qml	property string cfg_timeFormat
