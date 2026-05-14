@@ -59,7 +59,32 @@ jobs:
             echo "qmllint6 not available, skipping."
           fi
 
+      - name: Check safe-to-merge
+        id: safety
+        run: |
+          TARGETS="applets/digital-clock/DigitalClock.qml
+          applets/digital-clock/configAppearance.qml
+          applets/digital-clock/main.xml
+          applets/digital-clock/metadata.json"
+          # git diff <sha> <sha> compares trees directly — no ancestry needed, works with shallow clones
+          TOUCHED=$(git -C upstream diff --name-only \
+            "${{ steps.bump.outputs.old }}" "${{ steps.bump.outputs.new }}" \
+            -- applets/digital-clock/DigitalClock.qml \
+               applets/digital-clock/configAppearance.qml \
+               applets/digital-clock/main.xml \
+               applets/digital-clock/metadata.json \
+            2>/dev/null || echo "diff-failed")
+          echo "touched<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$TOUCHED"     >> "$GITHUB_OUTPUT"
+          echo "EOF"          >> "$GITHUB_OUTPUT"
+          if [ -z "$TOUCHED" ] && [ "${{ steps.anchors.outcome }}" = "success" ]; then
+            echo "safe=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "safe=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Open PR
+        id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
           branch: upstream-sync/${{ steps.bump.outputs.new }}
@@ -74,8 +99,19 @@ jobs:
             | **New** | `${{ steps.bump.outputs.new }}` |
 
             **Overlay anchor check:** `${{ steps.anchors.outcome }}`
-            - `success` = overlay still references valid upstream symbols, safe to merge
-            - `failure` = upstream refactored something our overlay patches; review `overlay/DigitalClock.qml` and `overlay/configAppearance.qml` before merging
+            **Overlay-target files touched:** `${{ steps.safety.outputs.touched != '' && steps.safety.outputs.touched || 'none' }}`
+            **Auto-merge:** ${{ steps.safety.outputs.safe == 'true' && 'enabled — will self-merge once CI passes' || 'blocked — needs manual review' }}
+
+            - `success` anchors + no overlay-target changes = auto-merge
+            - Any anchor failure or change to our 4 patched files = manual review required
 
             [View diff on KDE Invent](https://invent.kde.org/plasma/plasma-workspace/-/compare/${{ steps.bump.outputs.old }}...${{ steps.bump.outputs.new }})
-          labels: upstream-sync
+          labels: ${{ steps.safety.outputs.safe == 'true' && 'upstream-sync,auto-merge' || 'upstream-sync,needs-review' }}
+
+      - name: Auto-merge if safe
+        if: steps.safety.outputs.safe == 'true' && steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} \
+            --merge --delete-branch --auto
