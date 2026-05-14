@@ -515,23 +515,6 @@ MouseArea {
                 text: Qt.formatDateTime(clock.dateTime, "mm")
             }
 
-            PlasmaComponents.Label {
-                id: vertAmPmLabel
-                // VerticalClock: only shown in 12h mode when the toggle is enabled
-                visible: verticalClockStack.is12h && Plasmoid.configuration.showAmPmRow
-                Layout.fillWidth: true
-                Layout.preferredHeight: Math.round(vertHoursLabel.implicitHeight * 0.6)
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                fontSizeMode: Text.HorizontalFit
-                minimumPixelSize: 1
-                font.pixelSize: 1024
-                font.family: fontHelper.font.family
-                font.weight: fontHelper.font.weight
-                font.italic: fontHelper.font.italic
-                textFormat: Text.PlainText
-                text: Qt.formatDateTime(clock.dateTime, "AP")
-            }
         }
     }
     /*

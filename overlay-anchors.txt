@@ -14,7 +14,3 @@ DigitalClock.qml	anchors.top: labelsGrid.bottom
 DigitalClock.qml	anchors.horizontalCenter: labelsGrid.horizontalCenter
 DigitalClock.qml	contentItem.height: contentItem.Plasmoid.configuration.showDate ? labelsGrid.height + dateLabel.contentHeight : labelsGrid.height
 DigitalClock.qml	labelsGrid.rows: 2
-main.xml	<entry name="use24hFormat" type="UInt">
-configAppearance.qml	id: use24hFormat
-configAppearance.qml	cfg_use24hFormat
-configAppearance.qml	property string cfg_timeFormat
