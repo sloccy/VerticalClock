@@ -2,6 +2,10 @@
 # Assemble build/package/ from upstream + overlay.
 set -euo pipefail
 
+if [ ! -d upstream/applets/digital-clock ]; then
+    git submodule update --init upstream
+fi
+
 DEST=build/package
 
 rm -rf "$DEST"

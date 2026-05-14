@@ -11,10 +11,9 @@ A minimal fork of the KDE Plasma 6 digital clock (`org.kde.plasma.digitalclock`)
 ## Setup (first time)
 
 ```bash
-git clone https://github.com/<you>/VerticalClock.git
+git clone https://github.com/sloccy/VerticalClock.git
 cd VerticalClock
-bash scripts/setup.sh        # adds plasma-workspace as sparse submodule
-bash scripts/build.sh        # assembles build/package/
+bash scripts/build.sh        # auto-inits submodule on first run, then assembles build/package/
 ```
 
 ## Install / update on your Fedora KDE machine
@@ -57,7 +56,7 @@ Two workflows live in `.github/workflows/`:
 ## How the overlay works
 
 ```
-upstream/applets/digital-clock/   ← sparse-checkout of plasma-workspace
+upstream/applets/digital-clock/   ← plasma-workspace submodule
 overlay/                          ← only the 4 files we changed
 scripts/build.sh                  ← merge: upstream → build/package/ then overlay/ on top
 ```
