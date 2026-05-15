@@ -496,7 +496,7 @@ MouseArea {
                 font.features: { "tnum": 1 }
                 textFormat: Text.PlainText
                 // hh = 01-12 (padded, consistent width); HH = 00-23
-                text: verticalClockStack.is12h ? Qt.formatDateTime(clock.dateTime, "hhAP").substring(0, 2) : Qt.formatDateTime(clock.dateTime, "HH")
+                text: (verticalClockStack.is12h ? Qt.formatDateTime(clock.dateTime, "hhAP").substring(0, 2) : Qt.formatDateTime(clock.dateTime, "HH")).replace(/^0/, "")
             }
 
             PlasmaComponents.Label {
