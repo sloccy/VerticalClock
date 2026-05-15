@@ -28,6 +28,7 @@ jobs:
           NEW=$(git rev-parse HEAD)
           echo "old=$OLD" >> "$GITHUB_OUTPUT"
           echo "new=$NEW" >> "$GITHUB_OUTPUT"
+          echo "short_new=${NEW:0:12}" >> "$GITHUB_OUTPUT"
           if [ "$OLD" = "$NEW" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
@@ -88,7 +89,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           branch: upstream-sync/${{ steps.bump.outputs.new }}
-          title: "chore: upstream sync ${{ steps.bump.outputs.new && steps.bump.outputs.new[:12] || steps.bump.outputs.new }}"
+          title: "chore: upstream sync ${{ steps.bump.outputs.short_new }}"
           commit-message: "chore: bump upstream plasma-workspace to ${{ steps.bump.outputs.new }}"
           body: |
             Automated bump of `upstream/` submodule.
