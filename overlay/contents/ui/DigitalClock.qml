@@ -485,9 +485,10 @@ MouseArea {
                 id: vertHoursLabel
                 Layout.fillWidth: true
                 Layout.preferredHeight: sizehelperStack.contentHeight
+                Layout.maximumHeight: sizehelperStack.contentHeight
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                fontSizeMode: Text.HorizontalFit
+                fontSizeMode: Text.Fit
                 minimumPixelSize: 1
                 font.pixelSize: 1024
                 font.family: fontHelper.font.family
@@ -503,9 +504,10 @@ MouseArea {
                 id: vertMinutesLabel
                 Layout.fillWidth: true
                 Layout.preferredHeight: sizehelperStack.contentHeight
+                Layout.maximumHeight: sizehelperStack.contentHeight
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                fontSizeMode: Text.HorizontalFit
+                fontSizeMode: Text.Fit
                 minimumPixelSize: 1
                 font.pixelSize: 1024
                 font.family: fontHelper.font.family
