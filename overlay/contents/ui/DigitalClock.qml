@@ -255,7 +255,7 @@ MouseArea {
                 main.Layout.minimumHeight: main.Layout.maximumHeight
 
                 // VerticalClock: use the stacked layout height instead of labelsGrid
-                contentItem.height: verticalClockStack.implicitHeight + (Plasmoid.configuration.showDate ? dateLabel.contentHeight : 0)
+                contentItem.height: (sizehelperStack.contentHeight * 2) + (contentItem.Plasmoid.configuration.showDate ? dateLabel.contentHeight : 0)
                 contentItem.width: main.width
 
                 // VerticalClock: hide the original single-line grid in favour of verticalClockStack
@@ -280,7 +280,7 @@ MouseArea {
                 dateLabel.verticalAlignment: Text.AlignTop
                 // Those magic numbers are purely what looks nice as maximum size, here we have it the smallest
                 // between slightly bigger than the default font (1.4 times) and a bit smaller than the time font
-                dateLabel.font.pixelSize: Math.min(0.7 * vertHoursLabel.implicitHeight, contentItem.Kirigami.Theme.defaultFont.pixelSize * 1.4)
+                dateLabel.font.pixelSize: Math.min(0.7 * vertHoursLabel.contentHeight, contentItem.Kirigami.Theme.defaultFont.pixelSize * 1.4)
                 dateLabel.elide: Text.ElideRight
                 dateLabel.wrapMode: Text.WordWrap
 
@@ -484,6 +484,7 @@ MouseArea {
             PlasmaComponents.Label {
                 id: vertHoursLabel
                 Layout.fillWidth: true
+                Layout.preferredHeight: sizehelperStack.contentHeight
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 fontSizeMode: Text.HorizontalFit
@@ -495,13 +496,13 @@ MouseArea {
                 font.features: { "tnum": 1 }
                 textFormat: Text.PlainText
                 // hh = 01-12 (padded, consistent width); HH = 00-23
-                text: Qt.formatDateTime(clock.dateTime, verticalClockStack.is12h ? "hh" : "HH")
+                text: verticalClockStack.is12h ? Qt.formatDateTime(clock.dateTime, "hhAP").substring(0, 2) : Qt.formatDateTime(clock.dateTime, "HH")
             }
 
             PlasmaComponents.Label {
                 id: vertMinutesLabel
                 Layout.fillWidth: true
-                Layout.preferredHeight: vertHoursLabel.implicitHeight
+                Layout.preferredHeight: sizehelperStack.contentHeight
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 fontSizeMode: Text.HorizontalFit
@@ -548,6 +549,21 @@ MouseArea {
 
         visible: false
         textFormat: Text.PlainText
+    }
+
+    PlasmaComponents.Label {
+        id: sizehelperStack
+        width: main.width
+        height: main.width
+        font.family: fontHelper.font.family
+        font.weight: fontHelper.font.weight
+        font.italic: fontHelper.font.italic
+        font.pixelSize: 1024
+        fontSizeMode: Text.HorizontalFit
+        minimumPixelSize: 1
+        visible: false
+        textFormat: Text.PlainText
+        text: "00"
     }
 
     FontMetrics {
