@@ -4,8 +4,7 @@ A minimal fork of the KDE Plasma 6 digital clock (`org.kde.plasma.digitalclock`)
 
 ## What's different
 
-- **Vertical panel**: hours and minutes each fill a full row, sized to the panel width. AM/PM appears as an optional third row.
-- **AM/PM toggle**: configure → Appearance → "Show AM/PM indicator row" (visible only in 12-hour mode).
+- **Vertical panel**: hours and minutes each fill a full row, sized to the panel width.
 - Everything else (calendar popup, timezones, event plugins, tooltip, clipboard, horizontal rendering) is byte-identical to the upstream digital clock.
 
 ## Setup (first time)
@@ -43,9 +42,10 @@ bash scripts/update-upstream.sh
 
 ## GitHub Actions
 
-Two workflows live in `.github/workflows/`:
+Three workflows live in `.github/workflows/`:
 
 - **`ci.yml`** — runs on every push/PR; builds the package and checks overlay anchors.
+- **`release.yml`** — runs on every push to `main`; creates a rolling "latest" release with the installable zip.
 - **`upstream-sync.yml`** — runs every Monday 07:00 UTC **and** has a "Run workflow" button in the GitHub Actions tab. When upstream changes, it opens a PR with an anchor-check status so you know whether the overlay needs manual review before merging.
 
 ### One-time setup after pushing to GitHub
@@ -57,7 +57,7 @@ Two workflows live in `.github/workflows/`:
 
 ```
 upstream/applets/digital-clock/   ← plasma-workspace submodule
-overlay/                          ← only the 4 files we changed
+overlay/                          ← only the 2 files we changed
 scripts/build.sh                  ← merge: upstream → build/package/ then overlay/ on top
 ```
 
@@ -65,9 +65,7 @@ Changed files (our entire diff):
 | File | Change |
 |---|---|
 | `metadata.json` | New applet ID/name |
-| `main.xml` | Added `showAmPmRow` config key |
 | `DigitalClock.qml` | Vertical panel state: stacked layout |
-| `configAppearance.qml` | AM/PM toggle checkbox |
 
 ## Dependencies
 
