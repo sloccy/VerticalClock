@@ -22,8 +22,8 @@ jobs:
       - name: Verify required files exist
         run: |
           test -f build/package/metadata.json
-          test -f build/package/DigitalClock.qml
-          test -f build/package/main.xml
-          test -f build/package/main.qml
-          test -f build/package/CalendarView.qml
+          test -f build/package/contents/ui/main.qml
+          test -f build/package/contents/ui/DigitalClock.qml
+          test -f build/package/contents/ui/CalendarView.qml
+          test -f build/package/contents/config/main.xml
           echo "All required files present."
